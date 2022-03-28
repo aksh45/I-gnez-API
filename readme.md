@@ -1,4 +1,6 @@
 # Fest Registeration API
+## Warning
+This is development branch of I-GNEz API , features present in main and develop branch can vary drastically.
 
 This API was developed for I-GNEz 2021 the techfest of GNDEC. Thi api provide following functionalities :-
 1. User Registeration  :- User can register in an event and on registeration he will recieve a confirmation mail.

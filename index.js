@@ -3,21 +3,22 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const register = require('./routes/register');
-const events = require('./routes/events');
+const event = require('./routes/Event');
+const admin = require('./routes/Admin');
 const feedback = require('./routes/feedback');
-const authroute = require('./routes/auth');
+const authroute = require('./routes/Auth');
 const rcount = require('./routes/rcount');
 const sendmail = require('./routes/sendmail');
 require('dotenv/config');
 
 const bodyparser = require('body-parser');
 app.use(cors());
+app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
-app.use('/register',register);
+app.use('/event',event);
 app.use('/sendmail',sendmail);
 app.use('/rcount',rcount);
-app.use('/events',events);
+app.use('/admin',admin);
 app.use('/feedback',feedback);
 app.use('/auth',authroute);
 app.get('*',function(req, res){

@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const events = require('../models/events');
-const register = require('../models/register');
+const events = require('../models/Event');
+const register = require('../models/Register');
 const {send_mail} = require('../mail');
-const verif = require('./verif');
+const verif = require('../policies/isAuthenticated');
 require('dotenv').config();
 
 function sleep(ms) {

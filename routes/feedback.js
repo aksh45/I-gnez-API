@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const feedback = require('../models/feedback');
+const feedback = require('../models/Feedback');
 const {feedback_validation} = require("../validation");
 const nodemailer = require('nodemailer');
 const RateLimit = require('express-rate-limit');
 const MongoStore = require('rate-limit-mongo');
-const limit = require('../models/feedback');
+const limit = require('../models/Feedback');
 require('dotenv/config');
 var limiter = new RateLimit({
     store: new MongoStore({

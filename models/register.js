@@ -1,40 +1,16 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 const registerschema =  mongoose.Schema({
-	name:{
-		type:String,
-		required:true
+	user:{
+		type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 	},
-	email:{
-		type:String,
-		required:true
-	},
-	phone_no:{
-		type:String,
-		required:true
-	},
-	gender:{
-		type:String,
-		required:true
-	},
-	college:{
-		type:String,
-		required:true
-	},
-	college_city:{
-		type:String,
-		required:true
-	},
-	college_roll_no:{
-		type:String,
-		required:true
-	},
-	event_name:{
-		type:String,
-		required:true
+	event:{
+		type: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
 	},
 	team_name:{
 		type:String,
-		required:true
+		required:true,
+		unique:true
 	}
 });
 

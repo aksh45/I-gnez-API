@@ -9,7 +9,7 @@ module.exports = function (req,res,next){
 		return res.json({'message':'unauthorized'});
 	}
 	try{
- 		const verified =  jwt.verify(token,process.env.TOKEN_SECRET);
+ 		const verified =  jwt.verify(token,process.env.TOKEN_SECRET_ORGANIZER);
          
 		 req.valid__user = verified;
 		next();
