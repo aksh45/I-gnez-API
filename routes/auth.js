@@ -70,6 +70,7 @@ router.post('/signup',isAccountSetup,async(req,res)=>{
 
 })
 
+
 router.post('/accountsetup',async(req,res)=>{
     var admin_account = await User.findOne({type: 'admin'});
     

@@ -11,6 +11,7 @@ const isAuthenticated = require('../policies/isAuthenticated');
 const { nanoid } = require("nanoid");
 const ObjectId = require('mongodb').ObjectId;
 const {registerObjectValidation} = require('../services/ValidationService');
+const { send_mail } = require('../services/MailService');
 
 
 require('dotenv/config');
@@ -63,7 +64,7 @@ router.post('/:event_id',isAuthenticated,async(req,res)=>{
 	if(check_team_name)
 		return res.status(409).json({message: 'this team name is already taken'});
 	var user_ids = [];
-	req.body.team_members.push(req.user._id);
+	req.body.team_members.push(req.user.email);
 	for (const user_email of req.body.team_members) {
 		var user_details = await User.findOne({email: user_email});
 		if(user_details){
@@ -87,11 +88,23 @@ router.post('/:event_id',isAuthenticated,async(req,res)=>{
 			var user = {
                 email: user_email,
                 password: nanoid(),
-                type: ['particpant']
+                type: ['particpant'],
+				is_verified: true
             }
+			
 			var user_details = await User.create(user);
             user_ids.push(user_details._id);
 		}
+		if(user_email == req.user.email)
+			var mssg = `<!DOCTYPE html> <html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><p>Succesfully registered in <a href= "${process.env.DOMAIN_NAME}/event/${event_details._id}">${event_details.name}</a></p><p>Regards<br>Team I-GNEZ</p></body></html>`
+		else
+			var mssg = `<!DOCTYPE html> <html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><p>Hurray your friend <a href= "mailto:${req.user.email}">${req.user.email}</a> registered you for <a href= "${process.env.DOMAIN_NAME}/event/${event_details._id}">${event_details.name}</a></p><p>Regards<br>Team I-GNEZ</p></body></html>`
+		var data = {
+			reciever: user_email,
+			subject: `Registered for I-GNEz event`,
+			html: mssg
+		}
+		var mail_res = await send_mail(data);
 
 	}
 	
@@ -169,7 +182,16 @@ router.get('/:event_id',async(req,res)=>{
 	return res.status(404).json({message:'No such Event'});
 });
 
+router.get('/registered',isAuthenticated,async(req,res)=>{
+	var {page = 1 , limit = 10} = req.query; 
+	page = parseInt(page);
+	limit = Math.min(100,parseInt(limit));
+	const skip = limit*(page-1);
+	const registered_events = await Register.find({user: req.user._id}).skip(skip).limit(limit);
+	const count = await Register.countDocuments({user: req.user._id});
+	return res.json({registered_events: registered_events,totalPages:Math.ceil(count/limit),currentPage: page,count: count })
 
+})
 
 
 module.exports = router; 

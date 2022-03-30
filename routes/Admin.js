@@ -57,7 +57,7 @@ router.post('/event/create',isAccountSetup,isAuthenticated,isAdmin,async(req,res
 
 });
 
-router.get('/',isAccountSetup,isAuthenticated,isAdmin,async(req,res) =>{
+router.get('/events',isAccountSetup,isAuthenticated,isAdmin,async(req,res) =>{
     try {
         var {page = 1 , limit = 10} = req.query; 
         page = parseInt(page);
@@ -73,21 +73,35 @@ router.get('/',isAccountSetup,isAuthenticated,isAdmin,async(req,res) =>{
     }
 
 });
-router.get('/particpants',isAccountSetup,isAuthenticated,isAdmin,async(req,res) =>{
+router.get('/events/particpants',isAccountSetup,isAuthenticated,isAdmin,async(req,res) =>{
     try {
-        const all_particpants = await register.find({});
-        return res.json({message:all_particpants});
+        var {page = 1, limit = 10} = req.query;
+        page = parseInt(page);
+        limit = Math.min(100,parseInt(limit));
+        const skip = limit*(page-1);
+        const all_particpants = await register.find({}).skip(skip).limit(limit);
+        const count = await register.countDocuments();
+        return res.json({message:all_particpants,totalPages:Math.ceil(count/limit),currentPage: page,count: count});
         
       } 
       catch (err) {
         return res.json({message:'something went wrong'});
       }
 })
-router.post('/specific',isAccountSetup,isAuthenticated,isAdmin,async(req,res)=>{
-    const specific_event = req.body.event_name.toLowerCase();
+router.get('/event/:event_id/particpants',isAccountSetup,isAuthenticated,isAdmin,async(req,res)=>{
+    const specific_event = req.params.event_id;
     try{
-        const all_specific_event_registerations = await register.find({event_name:specific_event});
-        return res.json({message:all_specific_event_registerations});
+        var event_details = await Event.findOne({_id: specific_event});
+        if(!event_details){
+            return res.status(404).json({message: 'No such event'});
+        }
+        var {page = 1, limit = 10} = req.query;
+        page = parseInt(page);
+        limit = Math.min(100,parseInt(limit));
+        const skip = limit*(page-1);
+        const all_specific_event_registerations = await register.find({event:event_details._id}).skip(skip).limit(limit);
+        const count = await register.countDocuments({event:event_details._id});
+        return res.json({message:all_specific_event_registerations,totalPages:Math.ceil(count/limit),currentPage: page,count: count});
     }
     catch(err){
         return res.json({message:'Something Went Wrong'});
@@ -99,9 +113,9 @@ router.get('/organisers',isAccountSetup,isAuthenticated,isAdmin,async(req,res)=>
     page = parseInt(page);
     limit = Math.min(100,parseInt(limit));
     const skip = limit*(page-1);
-    const list_particpants = await User.find({type: 'organiser'}).limit(limit).skip(skip);
+    const list_organisers = await User.find({type: 'organiser'}).limit(limit).skip(skip);
     const count = await User.countDocuments({type: 'organiser'});
-    return res.json({particpants:list_particpants,totalPages: Math.ceil(count/limit),currentPage: page,count: count});
+    return res.json({organisers:list_organisers,totalPages: Math.ceil(count/limit),currentPage: page,count: count});
 
 })
 

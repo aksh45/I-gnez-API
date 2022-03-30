@@ -50,7 +50,7 @@ const isValidTeamName = (team_name)=>{
 const isValidTeamMembers = (team_members)=>{
 	if(!Array.isArray(team_members))
 		return false;
-	for(const team_member_email in team_members){
+	for(const team_member_email of team_members){
 		if(!isValidEmail(team_member_email))
 			return false;
 	}

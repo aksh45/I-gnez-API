@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const events = require('../models/Event');
 const register = require('../models/Register');
-const {send_mail} = require('../mail');
+const {send_mail} = require('../services/MailService');
 const verif = require('../policies/isAuthenticated');
 require('dotenv').config();
 
@@ -11,19 +11,8 @@ function sleep(ms) {
       setTimeout(resolve, ms);
     });
   }
-const nodemailer = require('nodemailer');
    
-const transporter = nodemailer.createTransport({
-    service: 'gndec.ac.in',
-  host: 'gndec.ac.in',
-  port: 465,
-  secure: true,
-  pool:true,
-    auth: {
-          user: process.env.mailuser,
-          pass: process.env.mailpass
-    }
-});
+
 router.post('/',verif,async(req,res)=>{
     var arr;
     if(req.body.reciever == 'all'){
@@ -40,7 +29,7 @@ router.post('/',verif,async(req,res)=>{
             var details_all = await register.findOne({email:arr[i]});
             const name_particpant = details_all['name'];
             await sleep(1000);
-            await send_mail({reciever:details_all['email'],subject:req.body.subject,text:'Hi '+ name_particpant +'\n'+req.body.text,transporter:transporter});
+            await send_mail({reciever:details_all['email'],subject:req.body.subject,text:'Hi '+ name_particpant +'\n'+req.body.text});
         }
 
         
@@ -52,11 +41,11 @@ router.post('/',verif,async(req,res)=>{
         for(var i=0;i<details_specific.length;i++){
             const name_particpant = details_specific[i]['name'];
             await sleep(1000);
-            await send_mail({reciever:details_specific[i]['email'],subject:req.body.subject,text:'Hi '+ name_particpant +'\n'+req.body.text,transporter:transporter});
+            await send_mail({reciever:details_specific[i]['email'],subject:req.body.subject,text:'Hi '+ name_particpant +'\n'+req.body.text});
         }
         
     
-        console.log('test');
+        
     }
 });
 

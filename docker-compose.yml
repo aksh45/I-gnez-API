@@ -1,0 +1,16 @@
+version: '3'
+services:
+  app:
+    container_name: 'fest_api'
+    restart: always
+    build: .
+    ports: 
+      - 3000:3000
+  mongo:
+    container_name: 'mongo'
+    image: 'mongo'
+    volumes: 
+      - mongo_data:/data/db 
+volumes:
+  mongo_data:
+    driver : local
